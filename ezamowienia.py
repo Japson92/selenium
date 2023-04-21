@@ -4,8 +4,16 @@ import json
 import firstUse
 import ssl
 
-url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&TenderType=1.1.1&PublicationDateFrom=2023-04-18T00:00:00&PublicationDateTo=2023-04-19T23:59:59&PageSize=10"
+#
+# startDate = input("Podaj date początkową wyszukiwanych ogłoszeń w formacie YYYY-MM-DD. ")
+# endDate = input("Podaj date końcową wyszukiwanych ogłoszeń w formacie YYYY-MM-DD. ")
 
+
+# url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}"\
+#     .format("2023-01-18", "2023-04-19", "10")
+# url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}"\
+#     .format(startDate, endDate, "10")
+url = "https://ted.europa.eu/api/v2/api-docs?PlaceOfPerformance=POL"
 # Additional detail for urllib
 # http.client.HTTPConnection.debuglevel = 1
 
@@ -13,7 +21,7 @@ conn = sqlite3.connect('Noticedatabase.sqlite')
 cur = conn.cursor()
 cur.execute("DROP TABLE IF EXISTS Notice")
 cur.execute('''
-CREATE TABLE IF NOT EXISTS Notice (noticeType TEXT, noticeNumber TEXT, bzpNumber TEXT, 
+CREATE TABLE IF NOT EXISTS Notice (id INTEGER UNIQUE,noticeType TEXT, noticeNumber TEXT, bzpNumber TEXT, 
 publicationDate TEXT, orderObject TEXT, cpvCode TEXT, submittingOffersDate TEXT, 
 organizationName TEXT, organizationCity TEXT, organizationProvince TEXT)''')
 
@@ -30,22 +38,27 @@ print('Retrieved', len(data), 'characters', data[:20].replace('\n', ' '))
 js = json.loads(data)
 print(json.dumps(js, indent=4))
 
-
-print(js[0]["orderType"])
 count = 0
 for line in js: 
-    cur.execute('''INSERT INTO Notice (noticeType, noticeNumber, bzpNumber, publicationDate,
+    cur.execute('''INSERT INTO Notice (id, noticeType, noticeNumber, bzpNumber, publicationDate,
         orderObject, cpvCode, submittingOffersDate, organizationName, organizationCity, 
-        organizationProvince) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                (js[count]["noticeType"], js[count]["noticeNumber"], js[count]["bzpNumber"],
+        organizationProvince) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (count + 1, js[count]["noticeType"], js[count]["noticeNumber"], js[count]["bzpNumber"],
                  js[count]["publicationDate"], js[count]["orderObject"], js[count]["cpvCode"],
                  js[count]["submittingOffersDate"], js[count]["organizationName"],
                  js[count]["organizationCity"], js[count]["organizationProvince"]))
     count += 1
 conn.commit()
-# searchingNumber = cur.execute("""SELECT bzpNumber FROM Notice WHERE
-#             orderObject='Dostawa oprogramowania do wirtualizacji wraz  z dożywotnimi licencjami'""",
-#                               )
-searchingNumber = "2023/BZP 00179991"
-firstUse.searching_date(searchingNumber)
-# print("Run geodump.py to read the data from the database so you can vizualize it on a map.")
+
+count = 0
+for line in js:
+    print((count + 1), js[count]["orderObject"])
+    count += 1
+
+searchId = input("Podaj który numer przetargu chcesz wyszukać? ")
+
+cur.execute("""SELECT bzpNumber FROM Notice WHERE
+            id={}""".format(searchId))
+
+for row in cur:
+    firstUse.searching_date(row)
