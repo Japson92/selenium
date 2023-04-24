@@ -9,11 +9,11 @@ import ssl
 # endDate = input("Podaj date końcową wyszukiwanych ogłoszeń w formacie YYYY-MM-DD. ")
 
 
-# url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}"\
-#     .format("2023-01-18", "2023-04-19", "10")
+url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}"\
+    .format("2023-01-18", "2023-04-19", "10")
 # url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}"\
 #     .format(startDate, endDate, "10")
-url = "https://ted.europa.eu/api/v2/api-docs?PlaceOfPerformance=POL"
+
 # Additional detail for urllib
 # http.client.HTTPConnection.debuglevel = 1
 
