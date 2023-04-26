@@ -34,9 +34,7 @@ def searching_notice_ted(noticeNumber):
     driver = webdriver.Chrome()
     driver.get("https://ted.europa.eu/TED/browse/browseByMap.do")
     time.sleep(2)
-    # more_button = driver.find_element(by=By.CLASS_NAME, value="btn-link")
-    # more_button.click()
-    # time.sleep(2)
+
     # posting notice number from db on website
     text_box = driver.find_element(by=By.ID, value="quickSearchCriteria")
     text_box.clear()
