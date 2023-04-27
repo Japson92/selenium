@@ -1,4 +1,5 @@
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 import sqlite3
 import json
 import ssl
@@ -30,7 +31,6 @@ def ted_search(startDate):
     data = uh.read().decode()
 
     js = json.loads(data)
-    # print(json.dumps(js, indent=4))
 
     count = 0
     while count < len(js["results"]):
@@ -42,8 +42,11 @@ def ted_search(startDate):
 
 
 def gov_search(startDate, endDate):
-    url = "https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&CpvCode=34971000&CpvCode=45000000&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}" \
-        .format(startDate, endDate, "10")
+    url = """https://ezamowienia.gov.pl/mo-board/api/v1/notice?NoticeType=ContractNotice&NoticeType=NoticeUpdateNotice
+&CpvCode=45100000&CpvCode=45000000&CpvCode=45111300&CpvCode=45232200&CpvCode=45232410&CpvCode=45233120
+&CpvCode=45233220&CpvCode=45311100&CpvCode=45316110&CpvCode=16000000&CpvCode=16700000&CpvCode=45233140
+&OrganizationProvince=PL26&PublicationDateFrom={}T00:00:00&PublicationDateTo={}T23:59:59&PageSize={}""" \
+        .format(startDate, endDate, "50").replace("\n", "")
 
     conn = sqlite3.connect('Noticedatabase.sqlite')
     cur = conn.cursor()
@@ -62,31 +65,15 @@ def gov_search(startDate, endDate):
     data = uh.read().decode()
 
     js = json.loads(data)
-    # print(json.dumps(js, indent=4))
 
     count = 0
-    for line in js:
+    for _ in js:
         cur.execute('''INSERT INTO Notice (id, noticeType, noticeNumber, bzpNumber, publicationDate,
                 orderObject, cpvCode, submittingOffersDate, organizationName, organizationCity, 
                 organizationProvince) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                        (count + 1, js[count]["noticeType"], js[count]["noticeNumber"], js[count]["bzpNumber"],
-                         js[count]["publicationDate"], js[count]["orderObject"], js[count]["cpvCode"],
-                         js[count]["submittingOffersDate"], js[count]["organizationName"],
-                         js[count]["organizationCity"], js[count]["organizationProvince"]))
+                    (count + 1, js[count]["noticeType"], js[count]["noticeNumber"], js[count]["bzpNumber"],
+                     js[count]["publicationDate"], js[count]["orderObject"], js[count]["cpvCode"],
+                     js[count]["submittingOffersDate"], js[count]["organizationName"],
+                     js[count]["organizationCity"], js[count]["organizationProvince"]))
         count += 1
     conn.commit()
-
-    #
-    # count = 0
-    # for line in js:
-    #     print((count + 1), js[count]["orderObject"])
-    #     count += 1
-    #
-    # searchId = input("Podaj który numer przetargu chcesz wyszukać? ")
-    #
-    # cur.execute("""SELECT bzpNumber FROM Notice WHERE
-    #             id={}""".format(searchId))
-
-    # firstUse.searching_notice_ted("234996-2023")
-    # for row in cur:
-    #     firstUse.searching_date(row)
